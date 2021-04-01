@@ -49,10 +49,20 @@ router.post('/', async (req, res, next) => {
 
   try {
     if (!name || !email || !phone) {
+      let errorMessage = 'missing required '
+      if (!name) {
+        errorMessage += 'name field'
+      }
+      if (!email) {
+        errorMessage += 'email field'
+      }
+      if (!phone) {
+        errorMessage += 'phone field'
+      }
       return res.status(400).json({
         status: 'error',
         code: 400,
-        message: 'missing required name field',
+        message: errorMessage,
       })
     } else {
       const newContact = await addContact(req.body)
