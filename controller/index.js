@@ -4,7 +4,7 @@ const {
   addContact,
   removeContact,
   updateContact
-} = require('../../model/index')
+} = require('../model/index')
 
 const getContacts = async (req, res, next) => {
   try {
