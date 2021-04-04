@@ -99,7 +99,7 @@ const deleteContact = async (req, res, next) => {
 }
 const update = async (req, res, next) => {
   try {
-    const contact = await updateContact(req.patams.contactId, req.body)
+    const contact = await updateContact(req.params.contactId, req.body)
     if (!req.body) {
       res.status(400).json({
         status: 'error',
