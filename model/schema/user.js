@@ -10,9 +10,9 @@ const usersSchema = new Schema(
       type: String,
       unique: true,
       required: [true, 'Email is required'],
-      validate(value) {
-        const re = /\S+@\S+\.\S+/
-        return re.test(String(value).toLoverCase())
+      validate: {
+        validator: (v) => /\S+@\S+\.\S+/.test(v),
+        message: (props) => `${props.value} invalid email`,
       }
     },
     password: {
@@ -33,7 +33,7 @@ const usersSchema = new Schema(
 )
 
 usersSchema.pre('save', async function (next) {
-  if (!this.isModifide('password')) return next()
+  if (!this.isModified('password')) return next()
   this.password = await bcrypt.hash(this.password, bcrypt.genSaltSync(SALT_FACTOR))
   next()
 })
