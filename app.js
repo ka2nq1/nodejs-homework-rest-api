@@ -4,6 +4,7 @@ const cors = require('cors')
 
 const contactsRouter = require('./routes/api/contacts')
 const usersRouter = require('./routes/api/users')
+const imagesRouter = require('./routes/api/images')
 
 const app = express()
 
