@@ -22,6 +22,7 @@ const reg = async (req, res, next) => {
         user: {
           email: newUser.email,
           subscription: newUser.subscription,
+          avatar: newUser.avatarURL
         },
       },
     })

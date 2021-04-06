@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const SALT_FACTOR = 6
 const { Schema } = mongoose
 const { Subscription } = require('../../helpers/constants')
+const gravatar = require('gravatar')
 
 const usersSchema = new Schema(
   {
@@ -28,6 +29,12 @@ const usersSchema = new Schema(
       type: String,
       default: null
     },
+    avatarURL: {
+      type: String,
+      default: () => {
+        return gravatar.url(this.email, { s: '250' }, true)
+      }
+    }
   },
   { versionKey: false, timestamps: true }
 )

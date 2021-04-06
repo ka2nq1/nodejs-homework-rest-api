@@ -1,12 +1,10 @@
 const multer = require('multer')
-const path = require('path')
 require('dotenv').config()
-
-const uploadDir = path.join(process.cwd(), process.env.uploadDir)
+const { UPLOAD_DIR } = require('./uploadPath')
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir)
+    cb(null, UPLOAD_DIR)
   },
   filename: (req, file, cb) => {
     cb(null, `${req.user._id}.jpg`)

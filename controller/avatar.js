@@ -2,8 +2,7 @@ const fs = require('fs').promises
 const path = require('path')
 const jimp = require('jimp')
 const User = require('../model/schema/user')
-
-const storeImage = path.join(process.cwd(), 'public', 'avatars')
+const { STORE_IMG } = require('../helpers/uploadPath')
 
 const createAvatar = async (id, file) => {
   const name = `${id}.jpg`
@@ -12,7 +11,7 @@ const createAvatar = async (id, file) => {
     .autocrop()
     .cover(250, 250, jimp.HORIZONTAL_ALIGN_CENTER || jimp.VERTICAL_ALIGN_TOP)
     .writeAsync(file)
-  await fs.rename(file, path.join(storeImage, name))
+  await fs.rename(file, path.join(STORE_IMG, name))
 
   const avatar = `http://localhost:3000/avatars/${name}`
   return avatar
