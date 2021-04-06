@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const { Schema } = mongoose
+const { Schema, SchemaTypes } = mongoose
 
 const contact = new Schema(
   {
@@ -24,6 +24,11 @@ const contact = new Schema(
       required: true,
     },
     token: { tupe: String },
+    owner: {
+      type: SchemaTypes.ObjectId,
+      ref: 'user',
+      required: true,
+    }
   },
   { versionKey: false, timestamps: true }
 )
