@@ -4,8 +4,11 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const gravatar = require('gravatar')
 const Jimp = require('jimp')
+const { v4: uuidv4 } = require('uuid')
 const createFolderIsNotExist = require('../helpers/imagesFolder')
-const { findUserById, findUserByEmail, addUser, updateToken, patchAvatar } = require('../model/users')
+const { findUserById, findUserByEmail, addUser, updateToken, patchAvatar, findByVerifyToken, updateVerifyToken } = require('../model/users')
+const { sendVerifyMail } = require('../helpers/email')
+
 const SECRET_KEY = process.env.JWT_SECRET_KEY
 
 const uploadDir = path.join(process.cwd(), process.env.UPLOAD_DIR)
@@ -23,7 +26,9 @@ const reg = async (req, res, next) => {
       })
     }
     const gravatarURL = gravatar.profile_url(email, { protocol: 'https', format: 'jpg' })
-    const newUser = await addUser({ ...req.body, avatarURL: gravatarURL })
+    const verifyToken = uuidv4()
+    const newUser = await addUser({ ...req.body, avatarURL: gravatarURL, verifyToken })
+    await sendVerifyMail(verifyToken, email)
     return res.status(201).json({
       status: 'success',
       data: {
@@ -128,10 +133,62 @@ const avatar = async (req, res, next) => {
   }
 }
 
+const verify = async (req, res, next) => {
+  try {
+    const user = await findByVerifyToken(req.params.verificationToken)
+    if (user) {
+      await updateVerifyToken(user.id, true, null)
+      return res.status(200).json({
+        status: 'success',
+        code: 200,
+        message: 'Verification successful',
+      })
+    }
+    return res.status(404).json({
+      status: 'error',
+      code: 404,
+      message: 'User not foun',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+const resendMail = async (req, res, next) => {
+  try {
+    const { email } = req.body
+    if (!email) {
+      return res.status(400).json({
+        status: 'error',
+        code: 400,
+        message: 'missing required field email',
+      })
+    }
+    const user = await findUserByEmail(email)
+    if (user.verify) {
+      return res.status(400).json({
+        status: 'error',
+        code: 400,
+        message: 'Verification has already been passed',
+      })
+    }
+    await sendVerifyMail(user.verifyToken, email)
+    res.status(200).json({
+      status: 'success',
+      code: 200,
+      message: 'Verification email sent',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 module.exports = {
   reg,
   login,
   logout,
   current,
-  avatar
+  avatar,
+  verify,
+  resendMail
 }
